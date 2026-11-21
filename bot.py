@@ -29,31 +29,29 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # --- 1. РАБОТА С БАЗОЙ ДАННЫХ ---
     try:
-    # Проверяем, есть ли игрок в базе
-    response = supabase.table("profiles").select("telegram_id").eq("telegram_id", user_id).execute()
-    
-    if not response.data:
-        supabase.table("profiles").insert({
-            "telegram_id": user_id,
-            "username": username
-        }).execute()
+        # ВАЖНО: Код ниже сдвинут вправо на 4 пробела
+        response = supabase.table("profiles").select("telegram_id").eq("telegram_id", user_id).execute()
         
-        supabase.table("game_saves").insert({
-            "telegram_id": user_id,
-            "save_data": {} 
-        }).execute()
-        
-        print(f"✅ Новый игрок {username} создан в базе!")
-    else:
-        print(f"ℹ️ Игрок {username} уже есть в базе.")
-        
-except Exception as e:
-    # Вот здесь важны отступы! Эти две строки должны быть строго под except
-    print(f"❌ Ошибка базы данных: {e}")
-    await update.message.reply_text(f"⚠️ Ошибка базы: {e}")
+        if not response.data:
+            supabase.table("profiles").insert({
+                "telegram_id": user_id,
+                "username": username
+            }).execute()
+            
+            supabase.table("game_saves").insert({
+                "telegram_id": user_id,
+                "save_data": {} 
+            }).execute()
+            
+            print(f"✅ Новый игрок {username} создан в базе!")
+        else:
+            print(f"ℹ️ Игрок {username} уже есть в базе.")
+            
+    except Exception as e:
+        print(f"❌ Ошибка базы данных: {e}")
+        await update.message.reply_text(f"⚠️ Ошибка базы: {e}")
 
     # --- 2. СОЗДАНИЕ И ОТПРАВКА КНОПКИ ---
-    # Добавляем user_id в ссылку, чтобы игра знала, кто именно играет
     game_url_with_id = f"{APP_URL}?user_id={user_id}"
     
     keyboard = [
@@ -66,7 +64,6 @@ except Exception as e:
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
-    # Отправляем сообщение с кнопкой
     await update.message.reply_text(
         f"Привет, {user_name}!\nТвой профиль готов. Нажимай кнопку ниже, чтобы начать!",
         reply_markup=reply_markup
