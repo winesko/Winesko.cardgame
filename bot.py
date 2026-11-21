@@ -3,22 +3,17 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 from supabase import create_client, Client
 
-# ==========================================
-# НАСТРОЙКИ (ВСТАВЬТЕ СВОИ ДАННЫЕ)
-# ==========================================
-# 1. Токен вашего бота (получите у @BotFather)
-TOKEN = "8765841092:AAFchpaGUdMeQYS2je3HZQ6vajQaItd13Co"
+# Получаем ключи из настроек Railway
+TOKEN = os.environ.get("8765841092:AAFchpaGUdMeQYS2je3HZQ6vajQaItd13Co")
+APP_URL = os.environ.get("APP_URL", "https://google.com")
+SUPABASE_URL = os.environ.get("https://iundgnfebsmcohzmmqln.supabase.co")
+SUPABASE_KEY = os.environ.get("sb_secret_spp9t34mxF4FlffonJ2ZbA_vfY0dplh")
 
-# 2. Ссылка на игру (пока оставьте пустой, вставим позже, когда выложим на Vercel)
-# Пример: "https://my-game.vercel.app"
-APP_URL = "https://google.com" 
+# Проверка на всякий случай
+if not TOKEN or not SUPABASE_URL or not SUPABASE_KEY:
+    print("ОШИБКА: Не заданы переменные окружения (BOT_TOKEN, SUPABASE_URL, SUPABASE_KEY)")
+    exit(1)
 
-# 3. Ключи от Supabase (URL и СЕКРЕТНЫЙ ключ Secret key)
-SUPABASE_URL = "https://iundgnfebsmcohzmmqln.supabase.co"
-SUPABASE_KEY = "sb_secret_spp9t34mxF4FlffonJ2ZbA_vfY0dplh"
-# ==========================================
-
-# Подключаемся к базе данных
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -29,7 +24,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # --- 1. РАБОТА С БАЗОЙ ДАННЫХ ---
     try:
-        # ВАЖНО: Код ниже сдвинут вправо на 4 пробела
         response = supabase.table("profiles").select("telegram_id").eq("telegram_id", user_id).execute()
         
         if not response.data:
@@ -71,13 +65,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     """Запуск бота."""
-    # Создаем приложение
     application = Application.builder().token(TOKEN).build()
-
-    # Добавляем обработчик команды /start
     application.add_handler(CommandHandler("start", start))
-
-    # Запускаем бота
     print("Бот запущен...")
     application.run_polling()
 
