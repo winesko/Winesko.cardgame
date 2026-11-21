@@ -3,11 +3,10 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, ContextTypes
 from supabase import create_client, Client
 
-TOKEN = os.environ.get("8765841092:AAFchpaGUdMeQYS2je3HZQ6vajQaItd13Co")
+TOKEN = os.environ.get("BOT_TOKEN")
 APP_URL = os.environ.get("APP_URL", "https://google.com")
-SUPABASE_URL = os.environ.get("https://iundgnfebsmcohzmmqln.supabase.co")
-SUPABASE_KEY = os.environ.get("sb_secret_spp9t34mxF4FlffonJ2ZbA_vfY0dplh")
-
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
