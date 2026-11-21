@@ -29,29 +29,27 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # --- 1. РАБОТА С БАЗОЙ ДАННЫХ ---
     try:
-        # Проверяем, есть ли игрок в базе
-        response = supabase.table("profiles").select("telegram_id").eq("telegram_id", user_id).execute()
+    # Проверяем, есть ли игрок в базе
+    response = supabase.table("profiles").select("telegram_id").eq("telegram_id", user_id).execute()
+    
+    if not response.data:
+        supabase.table("profiles").insert({
+            "telegram_id": user_id,
+            "username": username
+        }).execute()
         
-        if not response.data:
-            # Если нет — создаем профиль
-            supabase.table("profiles").insert({
-                "telegram_id": user_id,
-                "username": username
-            }).execute()
-            
-            # И создаем пустое сохранение для игры
-            supabase.table("game_saves").insert({
-                "telegram_id": user_id,
-                "save_data": {} 
-            }).execute()
-            
-            print(f"✅ Новый игрок {username} ({user_id}) успешно сохранен в Supabase!")
-        else:
-            print(f"ℹ️ Игрок {username} уже есть в базе.")
-            
-    except Exception as e:
+        supabase.table("game_saves").insert({
+            "telegram_id": user_id,
+            "save_data": {} 
+        }).execute()
+        
+        print(f"✅ Новый игрок {username} создан в базе!")
+    else:
+        print(f"ℹ️ Игрок {username} уже есть в базе.")
+        
+except Exception as e:
+    # Вот здесь важны отступы! Эти две строки должны быть строго под except
     print(f"❌ Ошибка базы данных: {e}")
-    # Отправляем ошибку прямо в чат, чтобы мы её увидели
     await update.message.reply_text(f"⚠️ Ошибка базы: {e}")
 
     # --- 2. СОЗДАНИЕ И ОТПРАВКА КНОПКИ ---
