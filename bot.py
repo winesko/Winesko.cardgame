@@ -50,8 +50,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"ℹ️ Игрок {username} уже есть в базе.")
             
     except Exception as e:
-        print(f"❌ Ошибка базы данных: {e}")
-        # Даже если база выдала ошибку, мы не роняем бота, а идем дальше
+    print(f"❌ Ошибка базы данных: {e}")
+    # Отправляем ошибку прямо в чат, чтобы мы её увидели
+    await update.message.reply_text(f"⚠️ Ошибка базы: {e}")
 
     # --- 2. СОЗДАНИЕ И ОТПРАВКА КНОПКИ ---
     # Добавляем user_id в ссылку, чтобы игра знала, кто именно играет
